@@ -1,11 +1,110 @@
-# math-lab-code
-clear all;
-clc;
-v1=[1;2;1;-1];v2=[3;1;0;5];v3=[0;5;3;-8];
-v=[v1 v2 v3];
-[r,basiccol]=rref(v);
-r_1=rank(rref(v));
-fprintf('dimension of subspace spanned by the given vectors is given by');
-r_1
-fprintf('basis of subspace is given by');
-b=v(:,basiccol)
+#include<stdio.h>
+#define stacksize 70
+#include<stdlib.h>
+#include<string.h>
+
+
+int input_precedence(char symbol)
+{
+  switch(symbol)
+  {
+     case'+':
+     case'-': return 1;
+     case'*':
+     case'/':
+     case'%': return 3;
+     case'^':
+     case'$': return 6;
+     case'(': return 9;
+     case')': return 0;
+     default: return 7;
+  }
+}
+
+
+
+int stack_precedence(char symbol)
+{
+  switch(symbol)
+  {
+   
+     case'+':
+     case'-': return 2;
+     case'*':
+     case'/':
+     case'%': return 4;
+     case'^':
+     case'$': return 5;
+     case'(': return 0;
+     case')': return -1;
+     case'#': return -1;
+     default: return 8;
+  }
+}
+ void push(char item , int*top, char s[])
+  {  
+       if(*top == stacksize-1)
+    {
+         printf("stack overflow\n");
+         return;
+    }
+    *top=*top + 1 ;
+    s[*top]= item;
+  }
+
+   char pop(int*top, char s[])
+   {
+      char item;
+      if(*top==-1)
+         return -1;
+         item=s[*top];
+         *top=*top-1;
+         return item;
+   }
+
+   void infix_postfix (char infix[],char postfix[])
+   {
+      int i, n, j, top;
+      char symbol, s[stacksize];
+      j=0;
+      top=-1;
+      push('#',&top,s);
+      n=strlen(infix);
+      for(i=0; i<n; i++)
+      {
+         symbol = infix[i];
+         while(stack_precedence(s[top])> input_precedence(symbol))
+         {
+            postfix[j]= pop(&top,s);
+            j=j+1;
+         }
+         if(stack_precedence (s[top])!=input_precedence(symbol))
+         {
+             push(symbol,&top,s);
+
+         }
+         else
+         {
+            pop(&top,s);
+
+         }
+      }
+      while(s[top]!='#')
+      {
+           postfix[j]=pop(&top,s);
+           j=j+1;
+      }
+      postfix[j]='\0';
+   }
+   void main()
+   {
+     char infix[70],postfix[70];
+     
+     printf("enter the infix expression\n");
+     scanf("%s",infix);
+     infix_postfix(infix,postfix);
+    printf("the postfix expression is %s",postfix);
+    
+     
+   }
+   
